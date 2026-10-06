@@ -10,6 +10,15 @@ class Funcionario(Base):
     senha = Column(String(255), nullable=False)
     controle = Column(Integer, nullable=False)
 
+class Cliente(Base):
+    __tablename__ = "cliente"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    nome = Column(String(100), nullable=False)
+    email = Column(String(150), unique=True)
+    cpf = Column(String(255), nullable=False)
+    telefone = Column(String(20), unique=True)
+    senha = Column(String(255), nullable=False)
 
 class Pedido(Base):
     __tablename__ = "pedido"

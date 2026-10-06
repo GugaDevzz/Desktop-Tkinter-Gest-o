@@ -39,6 +39,76 @@ class CozinhaApp(ctk.CTk):
         app_principal = CatatauLogin()
         app_principal.mainloop()
 
+    def carregar_historico(self):
+        """ Limpa os cards atuais e renderiza APENAS os pedidos FINALIZADOS """
+        # 1. Limpa os cards da tela
+        for widget in self.cards_frame.winfo_children():
+            widget.destroy()
+
+        session = SessionLocal()
+        try:
+            # Busca estritamente os pedidos FINALIZADOS
+            pedidos_historico = session.query(Pedido).options(
+                joinedload(Pedido.itens).joinedload(ItemPedido.produto)
+            ).filter(
+                Pedido.status == "FINALIZADO"
+            ).order_by(Pedido.id.desc()).all()
+
+            # Atualiza contadores do rodapé do painel
+            total_hoje = session.query(Pedido).count()
+            self.lbl_total_pedidos.configure(text=str(total_hoje))
+            self.lbl_prontos.configure(text=str(len(pedidos_historico)))
+
+            if not pedidos_historico:
+                lbl_vazio = ctk.CTkLabel(
+                    self.cards_frame, 
+                    text="Nenhum pedido no histórico! 📜", 
+                    font=ctk.CTkFont(size=18, weight="bold"),
+                    text_color=self.COLOR_BROWN
+                )
+                lbl_vazio.pack(pady=40)
+                return
+
+            colunas_max = 3
+            for index, pedido in enumerate(pedidos_historico):
+                row = index // colunas_max
+                col = index % colunas_max
+                
+                lista_itens = []
+                for item in pedido.itens:
+                    nome_prod = item.produto.nome if item.produto else "Produto sem nome"
+                    qtd = item.quantidade if item.quantidade else 1
+                    lista_itens.append(f"{qtd}x {nome_prod}")
+                
+                if not lista_itens:
+                    lista_itens = ["(Sem itens registrados)"]
+                
+                mesa_num = pedido.num_mesa if pedido.num_mesa is not None else 0
+                titulo_card = f"MESA {mesa_num}" if mesa_num > 0 else "BALCÃO"
+                sub_id_str = str(mesa_num) if mesa_num > 0 else ""
+                
+                nome_cliente = pedido.nome_cliente if pedido.nome_cliente else "Não informado"
+                desc_pedido = (pedido.descricao or "").strip()
+
+                # Reutiliza o SEU MÉTODO create_order_card original!
+                self.create_order_card(
+                    parent=self.cards_frame,
+                    row=row,
+                    column=col,
+                    pedido_id=pedido.id,
+                    title=titulo_card,
+                    sub_id=sub_id_str,
+                    name=nome_cliente,
+                    items=lista_itens,
+                    status="FINALIZADO",
+                    descricao=desc_pedido
+                )
+
+        except Exception as e:
+            print(f"Erro ao carregar histórico: {e}")
+        finally:
+            session.close()    
+
     def setup_ui(self):
         # Frame Principal (Esquerda + Centro) e Sidebar (Direita)
         self.grid_columnconfigure(0, weight=1)
@@ -178,7 +248,11 @@ class CozinhaApp(ctk.CTk):
             )
             btn.pack(side="left", padx=15)
 
-            if item == "LOGOUT":
+            if item == "INÍCIO":
+                btn.configure(command=self.carregar_pedidos) # Volta para os ativos
+            elif item == "HISTÓRICO":
+                btn.configure(command=self.carregar_historico) # Vai para o histórico
+            elif item == "LOGOUT":
                 btn.configure(command=self.logout)
 
     # --- LÓGICA BANCO DE DADOS ---
@@ -402,9 +476,3 @@ class CozinhaApp(ctk.CTk):
         lbl_valor.pack(anchor="w")
         
         return lbl_valor
-
-
-if __name__ == "__main__":
-    app = CozinhaApp()
-    app.mainloop()
-

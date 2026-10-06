@@ -3,8 +3,9 @@ from PIL import Image, ImageOps
 # from Componentes.verificacoes import Verificacoes
 from DB.models import Funcionario
 from DB.Banco import SessionLocal
-from paginas.pagina_cozinha import CozinhaApp  # Importa a classe da pagina principal
+from paginas.paginaCozinha.pedidos import CozinhaApp  # Importa a classe da pagina principal
 from paginas.paginasADM.pagina_adm import PaginaADM
+# from paginas.paginaCozinha.historico import HistoricoApp
 
 # Configurações globais de tema
 ctk.set_appearance_mode("Light")
