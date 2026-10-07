@@ -36,7 +36,7 @@ class ClientesView(ctk.CTkFrame):
         # Título
         ctk.CTkLabel(
             self,
-            text="BASE DE CLIENTES 👥",
+            text="BASE DE CLIENTES CADASTRADOS👥",
             font=ctk.CTkFont(size=18, weight="bold"),
             text_color="#3A1A10"
         ).pack(anchor="w", padx=20, pady=15)

@@ -220,6 +220,7 @@ class CozinhaApp(ctk.CTk):
                 text=texto_alerta,
                 font=ctk.CTkFont(size=13),
                 text_color='black',
+                justify="left"
             )
             alert_label.pack(anchor='w', padx=15, pady=2)
 

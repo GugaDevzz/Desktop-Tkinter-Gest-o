@@ -132,7 +132,7 @@ class EstoqueView(ctk.CTkFrame):
                 self.itens_estoque.append({
                     "id": item.id,
                     "nome": item.nome, 
-                    "qtd": str(item.quantidade),
+                    "qtd": round(float(item.quantidade), 2),
                     "status": item.status
                 })
         except Exception as e:
@@ -198,15 +198,14 @@ class EstoqueView(ctk.CTkFrame):
                 item_db = session.query(Ingredientes).filter_by(id=item_original["id"]).first()
                 if item_db:
                     item_db.nome = nome
-                    item_db.quantidade = float(qtd)
+                    item_db.quantidade = round(float(qtd), 2)
                     item_db.status = status
                     session.commit()
             else:
                 # Criação: adiciona um novo registro no banco
                 novo_item = Ingredientes(
                     nome=nome,
-                    unidade_medida="", # Opcional se já estiver incluído no nome (ex: "Pão (uni.)")
-                    quantidade=float(qtd),
+                    quantidade=round(float(qtd), 2),
                     status=status
                 )
                 session.add(novo_item)

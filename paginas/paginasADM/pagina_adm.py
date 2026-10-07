@@ -134,7 +134,3 @@ class PaginaADM(ctk.CTk):
         ctk.CTkButton(footer, text="LOGOUT", fg_color="transparent", text_color="#FFF", hover_color="#52291B", font=ctk.CTkFont(weight="bold"), command=self.logout).pack(side="left", expand=True)
 
         ctk.CTkButton(footer, text="AJUDA", fg_color="transparent", text_color="#FFF", hover_color="#52291B", font=ctk.CTkFont(weight="bold")).pack(side="right", expand=True)
-
-if __name__ == "__main__":
-    app = PaginaADM()
-    app.mainloop()
