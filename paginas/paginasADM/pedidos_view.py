@@ -53,10 +53,10 @@ class DetalhesPedidoModal(ctk.CTkToplevel):
         if pedido.descricao:
             ctk.CTkLabel(
                 info_box,
-                text=f"📝 Obs: {pedido.descricao}",
+                text=f"📝 Obs: {pedido.descricao}" + " ",
                 font=ctk.CTkFont(size=11, slant="italic"),
-                text_color="#666"
-            ).pack(anchor="w", padx=10, pady=(2, 5))
+                text_color="#667"
+            ).pack(anchor="w", padx=10, pady=(4, 5))
 
         # Itens do Pedido
         ctk.CTkLabel(
@@ -106,13 +106,14 @@ class DetalhesPedidoModal(ctk.CTkToplevel):
         btn_frame = ctk.CTkFrame(main_frame, fg_color="transparent")
         btn_frame.pack(fill="x", padx=15, pady=(15, 5))
 
-        ctk.CTkButton(
-            btn_frame,
-            text="🖨️ Imprimir Comanda",
-            fg_color="#3A1A10",
-            hover_color="#522618",
-            width=180
-        ).pack(side="left", expand=True, padx=2)
+        # ctk.CTkButton(
+        #     btn_frame,
+        #     text="🖨️ Imprimir Comanda",
+        #     fg_color="#3A1A10",
+        #     hover_color="#522618",
+        #     width=180
+        # ).pack(side="left", expand=True, padx=2)
+        # essa parte pode ser usada para fins futuros de impressão de nota, para controle físico
 
         ctk.CTkButton(
             btn_frame,

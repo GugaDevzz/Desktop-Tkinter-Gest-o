@@ -115,10 +115,12 @@ class PaginaADM(ctk.CTk):
         ctk.CTkLabel(info, text="CATATAU", font=ctk.CTkFont(size=15, weight="bold"), text_color="#000").pack(anchor="w")
 
         ctk.CTkLabel(sidebar, text="Admin Control", font=ctk.CTkFont(size=13, weight="bold"), text_color="#000").pack(anchor="w", padx=15, pady=(10, 10))
-
-        menu = ["👥 Gerenciar Usuários", "🏷️ Ativar Cupom\n    PROMO50", "📄 Relatório de\n    Fechamento", "⚙️ Configurações"]
+        
+        menu = ["👥 Gerenciar Usuários", "📄 Relatório de\n    Fechamento", "⚙️ Configurações"]
         for item in menu:
             ctk.CTkButton(sidebar, text=item, anchor="w", fg_color="transparent", text_color="#000", hover_color="#DFCBB8", font=ctk.CTkFont(size=12, weight="bold"), height=38).pack(fill="x", padx=8, pady=3)
+
+        # gerencias usuarios deve aparecer todas as informações contidas na tabela clientes 
 
     def logout(self):
         from paginas.pagina_login import CatatauLogin
