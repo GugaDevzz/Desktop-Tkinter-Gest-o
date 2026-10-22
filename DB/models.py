@@ -84,3 +84,12 @@ class Ingredientes(Base):
 
     # Relacionamento reverso para a tabela associativa
     produtos_utilizados = relationship("ProdutoEstoque", back_populates="ingrediente", cascade="all, delete-orphan")
+
+
+
+
+    #criar nova tabela tempos com duas colunas, inicio e fim, fazer com que quando a cozinha clicar em iniciar pedido começa a contagem na 
+    #coluna inicio, e la fica printado o horario que começou, quando finalizar o pedido ent para o tempo e printa quanto parou direto na
+    #coluna fim, depois na pagina de historico apresentando junto com em cada pedido o horario de termino, depois pega todos que existem e
+    # faz a media.
+    # fazer direto no itens pedido, pois o horario de inicio e termino vem junto 
