@@ -32,6 +32,9 @@ class CatatauLogin(ctk.CTk):
         self.montar_lado_esquerdo_banner()
         self.montar_lado_direito_login()
 
+        self.ent_user.bind("<Return>", self.acao_login)
+        self.ent_pass.bind("<Return>", self.acao_login)    
+
 
     def montar_lado_esquerdo_banner(self):
         """LADO ESQUERDO: Imagem de fundo com a logo sobreposta em camadas"""
@@ -168,7 +171,7 @@ class CatatauLogin(ctk.CTk):
             )
             self.btn_login.pack(fill="x", padx=45, pady=(0, 20))
 
-    def acao_login(self):
+    def acao_login(self, event=None):
          
         usuario = self.ent_user.get().strip()
         senha = self.ent_pass.get().strip()
@@ -208,5 +211,7 @@ class CatatauLogin(ctk.CTk):
                 app_principal.mainloop()
         finally:
             session.close()
+
+    
      
         
