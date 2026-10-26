@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Float, ForeignKey
+from sqlalchemy import Column, Integer, String, Float, ForeignKey, DateTime
 from DB.Banco import Base
 from sqlalchemy.orm import relationship
 
@@ -29,6 +29,8 @@ class Pedido(Base):
     valor_final = Column(Float, default=0.0)
     nome_cliente = Column(String(100), nullable=True)
     descricao = Column(String(255), nullable=True) 
+    data_hora_inicio = Column(DateTime, nullable=True)
+    data_hora_fim = Column(DateTime, nullable=True)
 
     # Relacionamento com itens do pedido
     itens = relationship("ItemPedido", back_populates="pedido", cascade="all, delete-orphan")

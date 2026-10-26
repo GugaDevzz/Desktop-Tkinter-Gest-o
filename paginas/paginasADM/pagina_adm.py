@@ -4,8 +4,11 @@ from paginas.paginasADM.dashboard_view import DashboardView
 from paginas.paginasADM.pedidos_view import PedidosView
 from paginas.paginasADM.estoque_view import EstoqueView
 from paginas.paginasADM.clientes_view import ClientesView
+from paginas.paginasADM.clientes_view import ClienteRow
 from paginas.paginasADM.cupons_view import CuponsView
 from paginas.paginasADM.relatorios_view import RelatoriosView
+from DB.Banco import SessionLocal
+from DB.models import Cliente
 
 
 ctk.set_appearance_mode("Light")
@@ -61,6 +64,37 @@ class PaginaADM(ctk.CTk):
 
         # Mostrar tela inicial
         self.show_page("DASHBOARD")
+
+
+    def carregar_clientes(self):
+      # Pega o container scrollável direto da view de clientes guardada no dicionário
+      scroll_container = self.pages["CLIENTES"].scroll
+
+      # Limpa widgets anteriores caso haja recarregamento
+      for child in scroll_container.winfo_children():
+        child.destroy()
+
+      session = SessionLocal()
+      try:
+        # Busca todos os clientes do banco de dados
+        clientes = session.query(Cliente).all()
+
+        if not clientes:
+          ctk.CTkLabel(
+              scroll_container,
+              text="Nenhum cliente cadastrado.",
+              font=ctk.CTkFont(size=13),
+              text_color="#888",
+          ).pack(pady=20)
+          return
+
+        # Instancia um componente ClienteRow para cada registro do banco
+        for cliente in clientes:
+          card = ClienteRow(scroll_container, cliente=cliente, on_click=None)
+          card.pack(fill="x", pady=4, padx=5)
+
+      finally:
+        session.close()
 
     def create_navbar(self):
         nav_frame = ctk.CTkFrame(self.left_container, fg_color="transparent")
@@ -119,6 +153,14 @@ class PaginaADM(ctk.CTk):
         menu = ["👥 Gerenciar Usuários", "📄 Relatório de\n    Fechamento", "⚙️ Configurações"]
         for item in menu:
             ctk.CTkButton(sidebar, text=item, anchor="w", fg_color="transparent", text_color="#000", hover_color="#DFCBB8", font=ctk.CTkFont(size=12, weight="bold"), height=38).pack(fill="x", padx=8, pady=3)
+
+        btn_atualizar = ctk.CTkButton(
+            sidebar, text="🔄 Atualizar Lista", 
+            fg_color="transparent", text_color="#000", 
+            anchor="w", hover_color="#DFCBB8", font=ctk.CTkFont(size=12, weight="bold"),
+            command=self.carregar_clientes
+        )
+        btn_atualizar.pack(fill="x", padx=10, pady=2)    
 
         # gerencias usuarios deve aparecer todas as informações contidas na tabela clientes 
 

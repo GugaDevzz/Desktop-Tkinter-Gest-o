@@ -2,7 +2,6 @@ import customtkinter as ctk
 from DB.Banco import SessionLocal
 from DB.models import Cliente
 
-
 class ClienteRow(ctk.CTkFrame):
     """Componente que representa cada linha/campo individual de um cliente."""
     def __init__(self, parent, cliente: Cliente, on_click=None):
@@ -44,35 +43,41 @@ class ClientesView(ctk.CTkFrame):
         # Container rolável
         self.scroll = ctk.CTkScrollableFrame(self, fg_color="transparent")
         self.scroll.pack(fill="both", expand=True, padx=15, pady=(0, 15))
-
-        # Carrega os registros
-        self.carregar_clientes()
-
-    def carregar_clientes(self):
-        # Limpa widgets anteriores caso haja recarregamento
         for child in self.scroll.winfo_children():
             child.destroy()
-
         session = SessionLocal()
-        try:
-            # Busca todos os clientes do banco de dados
-            clientes = session.query(Cliente).all()
+        clientes = session.query(Cliente).all()
+        for cliente in clientes:
+            card = ClienteRow(self.scroll, cliente=cliente, on_click=None)
+            card.pack(fill="x", pady=4, padx=5)
+        # Carrega os registros
+        # self.Pagin()
 
-            if not clientes:
-                ctk.CTkLabel(
-                    self.scroll,
-                    text="Nenhum cliente cadastrado.",
-                    font=ctk.CTkFont(size=13),
-                    text_color="#888"
-                ).pack(pady=20)
-                return
+    # def carregar_clientes(self):
+    #     # Limpa widgets anteriores caso haja recarregamento
+    #     for child in self.scroll.winfo_children():
+    #         child.destroy()
 
-            # Instancia um componente ClienteRow para cada registro do banco
-            for cliente in clientes:
-                card = ClienteRow(self.scroll, cliente=cliente, on_click=None)
-                card.pack(fill="x", pady=4, padx=5)
+    #     session = SessionLocal()
+    #     try:
+    #         # Busca todos os clientes do banco de dados
+    #         clientes = session.query(Cliente).all()
 
-        finally:
-            session.close()
+    #         if not clientes:
+    #             ctk.CTkLabel(
+    #                 self.scroll,
+    #                 text="Nenhum cliente cadastrado.",
+    #                 font=ctk.CTkFont(size=13),
+    #                 text_color="#888"
+    #             ).pack(pady=20)
+    #             return
+
+    #         # Instancia um componente ClienteRow para cada registro do banco
+    #         for cliente in clientes:
+    #             card = ClienteRow(self.scroll, cliente=cliente, on_click=None)
+    #             card.pack(fill="x", pady=4, padx=5)
+
+    #     finally:
+    #         session.close()
 
     
