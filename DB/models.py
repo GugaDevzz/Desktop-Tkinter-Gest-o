@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Float, ForeignKey, DateTime
+from sqlalchemy import Column, Integer, String, Float, ForeignKey, DateTime, Boolean
 from DB.Banco import Base
 from sqlalchemy.orm import relationship
 
@@ -19,6 +19,8 @@ class Cliente(Base):
     cpf = Column(String(255), nullable=False)
     telefone = Column(String(20), unique=True)
     senha = Column(String(255), nullable=False)
+    cupom_usado = Column(Boolean, default=False, nullable=False)
+    pedidos_count = Column(Integer, default=0, nullable=False)
 
 class Pedido(Base):
     __tablename__ = "pedido"
@@ -88,6 +90,13 @@ class Ingredientes(Base):
     produtos_utilizados = relationship("ProdutoEstoque", back_populates="ingrediente", cascade="all, delete-orphan")
 
 
+class Cupom(Base):
+    __tablename__ = 'Cupom'
+
+    id = Column('ID', Integer, primary_key=True, autoincrement=True)
+    codigo = Column('Codigo', String(100), nullable=False)
+    desconto = Column('Desconto', String(150))
+    controle = Column('Controle', Boolean, server_default='1')
 
 
     #criar nova tabela tempos com duas colunas, inicio e fim, fazer com que quando a cozinha clicar em iniciar pedido começa a contagem na 

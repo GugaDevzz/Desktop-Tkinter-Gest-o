@@ -8,7 +8,7 @@ from paginas.paginasADM.clientes_view import ClienteRow
 from paginas.paginasADM.cupons_view import CuponsView
 from paginas.paginasADM.relatorios_view import RelatoriosView
 from DB.Banco import SessionLocal
-from DB.models import Cliente
+from DB.models import Cliente, Pedido
 
 
 ctk.set_appearance_mode("Light")
@@ -66,35 +66,92 @@ class PaginaADM(ctk.CTk):
         self.show_page("DASHBOARD")
 
 
-    def carregar_clientes(self):
-      # Pega o container scrollável direto da view de clientes guardada no dicionário
-      scroll_container = self.pages["CLIENTES"].scroll
+    def carregar_dados_geral(self):
+        """Função única na PaginaADM que atualiza tanto os Clientes quanto os Pedidos de uma vez só"""
+        session = SessionLocal()
+        try:
+            # 1. CARREGAR CLIENTES
+            scroll_clientes = self.pages["CLIENTES"].scroll
+            for child in scroll_clientes.winfo_children():
+                child.destroy()
+                
+            session.rollback() # Limpa o cache da sessão atual
+            
+            clientes = session.query(Cliente).all()
+            if not clientes:
+                ctk.CTkLabel(
+                    scroll_clientes,
+                    text="Nenhum cliente cadastrado.",
+                    font=ctk.CTkFont(size=13),
+                    text_color="#888",
+                ).pack(pady=20)
+            else:
+                for cliente in clientes:
+                    card = ClienteRow(scroll_clientes, cliente=cliente, on_click=None)
+                    card.pack(fill="x", pady=4, padx=5)
 
-      # Limpa widgets anteriores caso haja recarregamento
-      for child in scroll_container.winfo_children():
-        child.destroy()
+            # 2. CARREGAR PEDIDOS
+            scroll_pedidos = self.pages["PEDIDOS"].scroll
+            for child in scroll_pedidos.winfo_children():
+                child.destroy()
 
-      session = SessionLocal()
-      try:
-        # Busca todos os clientes do banco de dados
-        clientes = session.query(Cliente).all()
+            # Cabeçalhos da tabela de pedidos
+            headers = ["ID", "Mesa", "Cliente", "Itens", "Total", "Status", "Ação"]
+            h_frame = ctk.CTkFrame(scroll_pedidos, fg_color="#F3EBE1", height=30)
+            h_frame.pack(fill="x", pady=2)
+            for h in headers:
+                ctk.CTkLabel(
+                    h_frame,
+                    text=h,
+                    font=ctk.CTkFont(size=12, weight="bold"),
+                    text_color="#000",
+                    width=100
+                ).pack(side="left", expand=True)
 
-        if not clientes:
-          ctk.CTkLabel(
-              scroll_container,
-              text="Nenhum cliente cadastrado.",
-              font=ctk.CTkFont(size=13),
-              text_color="#888",
-          ).pack(pady=20)
-          return
+            pedidos = session.query(Pedido).order_by(Pedido.id.desc()).all()
+            if not pedidos:
+                ctk.CTkLabel(
+                    scroll_pedidos,
+                    text="Nenhum pedido cadastrado.",
+                    font=ctk.CTkFont(size=13),
+                    text_color="#888",
+                ).pack(pady=20)
+            else:
+                for p in pedidos:
+                    row = ctk.CTkFrame(scroll_pedidos, fg_color="#F9F9F9", height=35)
+                    row.pack(fill="x", pady=2)
 
-        # Instancia um componente ClienteRow para cada registro do banco
-        for cliente in clientes:
-          card = ClienteRow(scroll_container, cliente=cliente, on_click=None)
-          card.pack(fill="x", pady=4, padx=5)
+                    total_itens = sum(item.quantidade for item in p.itens) if p.itens else 0
+                    if total_itens == 0:
+                        resumo_itens = "Sem lanches"
+                    elif total_itens == 1:
+                        resumo_itens = "1x Lanche"
+                    else:
+                        resumo_itens = f"{total_itens}x Lanches"
 
-      finally:
-        session.close()
+                    nome_cliente = p.nome_cliente if p.nome_cliente else "-"
+                    valor = p.valor_final if p.valor_final else 0.0
+
+                    ctk.CTkLabel(row, text=f"#{p.id}", font=ctk.CTkFont(size=12), text_color="#000", width=100).pack(side="left", expand=True)
+                    ctk.CTkLabel(row, text=f"Mesa {p.num_mesa}", font=ctk.CTkFont(size=12), text_color="#000", width=100).pack(side="left", expand=True)
+                    ctk.CTkLabel(row, text=nome_cliente, font=ctk.CTkFont(size=12), text_color="#000", width=100).pack(side="left", expand=True)
+                    ctk.CTkLabel(row, text=resumo_itens, font=ctk.CTkFont(size=12), text_color="#000", width=100).pack(side="left", expand=True)
+                    ctk.CTkLabel(row, text=f"R$ {valor:.2f}".replace('.', ','), font=ctk.CTkFont(size=12), text_color="#000", width=100).pack(side="left", expand=True)
+                    ctk.CTkLabel(row, text=p.status, font=ctk.CTkFont(size=12), text_color="#000", width=100).pack(side="left", expand=True)
+
+                    btn_detalhes = ctk.CTkButton(
+                        row,
+                        text="Detalhes",
+                        width=80,
+                        height=24,
+                        fg_color="#3A1A10",
+                        font=ctk.CTkFont(size=11),
+                        command=lambda p_id=p.id, s=session: self.pages["PEDIDOS"].abrir_detalhes(p_id)
+                    )
+                    btn_detalhes.pack(side="left", expand=True)
+        finally:
+            session.close()
+
 
     def create_navbar(self):
         nav_frame = ctk.CTkFrame(self.left_container, fg_color="transparent")
@@ -158,7 +215,7 @@ class PaginaADM(ctk.CTk):
             sidebar, text="🔄 Atualizar Lista", 
             fg_color="transparent", text_color="#000", 
             anchor="w", hover_color="#DFCBB8", font=ctk.CTkFont(size=12, weight="bold"),
-            command=self.carregar_clientes
+            command=self.carregar_dados_geral
         )
         btn_atualizar.pack(fill="x", padx=10, pady=2)    
 
