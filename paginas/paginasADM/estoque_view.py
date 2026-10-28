@@ -1,6 +1,7 @@
 import customtkinter as ctk
 # Importe a sessão e o modelo do seu banco (ajuste o caminho se necessário)
 from DB.Banco import SessionLocal as Session
+
 from DB.models import Ingredientes
 
 class ModalItemEstoque(ctk.CTkToplevel):
