@@ -33,7 +33,6 @@ class DashboardView(ctk.CTkFrame):
             )
             .join(ItemPedido, ItemPedido.fk_id_produto == Produto.id)
             .join(Pedido, ItemPedido.fk_id_pedido == Pedido.id)
-            .filter(cast(Pedido.data_hora_inicio, Date) == date.today())
             .group_by(Produto.id, Produto.nome)
             .order_by(func.sum(ItemPedido.quantidade).desc())
             .limit(3)
